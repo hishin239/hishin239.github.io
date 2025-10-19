@@ -1,10 +1,227 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Ma page GitHub</title>
-  </head>
-  <body>
-    <h1>Hello GitHub Pages !</h1>
-    <img src="image.jpg" alt="Mon image">
-  </body>
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TFE — Gestion d'emprunt de matériel</title>
+  <style>
+    :root{--accent:#1d4ed8;--muted:#6b7280;--bg:#f8fafc;--card:#ffffff}
+    body{font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg); margin:0; color:#0f172a}
+    header{background:linear-gradient(90deg,#eef2ff,transparent);padding:28px 20px;border-bottom:1px solid #e6edf3}
+    .container{max-width:980px;margin:20px auto;padding:0 18px}
+    h1{margin:0;font-size:28px}
+    .subtitle{color:var(--muted);margin-top:6px}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:20px}
+    .card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+    .small{font-size:14px;color:var(--muted)}
+    section h2{margin-top:0}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{padding:8px 10px;border-bottom:1px solid #eef2f6;text-align:left}
+    th{background:#fbfdff;font-weight:600}
+    pre{background:#0f172a;color:#e6eef8;padding:12px;border-radius:8px;overflow:auto;font-family:Menlo,monospace;font-size:13px}
+    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:var(--accent);color:#fff;text-decoration:none;font-weight:600}
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:var(--accent);font-weight:600}
+    footer{margin:28px 0;color:var(--muted);font-size:14px;text-align:center}
+    .requirements li{margin-bottom:8px}
+    .row{display:flex;gap:12px;align-items:center}
+    .code-meta{font-size:13px;color:var(--muted);margin-top:8px}
+    @media (max-width:880px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <h1>Gestion d'emprunt de matériel — TFE</h1>
+      <div class="subtitle">Synthèse du projet — application pour gérer les prêts, l'état matériel, les notifications et les sauvegardes</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <div>
+        <article class="card">
+          <h2>1. Contexte et objectif du projet</h2>
+          <p class="small">Résumé</p>
+          <p>
+            L'école met à disposition du matériel (informatique et fournitures) empruntable par les élèves et enseignants. L'application vise à gérer les utilisateurs, suivre l'état du matériel (neuf / mauvais état), détecter les retards, générer des amendes et centraliser les informations dans une base de données sécurisée et sauvegardée régulièrement.
+          </p>
+
+          <h3>Objectifs détaillés</h3>
+          <ul class="requirements">
+            <li>Faciliter la gestion des emprunts et des retours.</li>
+            <li>Réduire les pertes et retards.</li>
+            <li>Suivi précis de l'état et de l'utilisation du matériel.</li>
+            <li>Système de notifications automatiques (retards) et génération d'amendes.</li>
+            <li>Sauvegarde régulière et sécurisée des données (résilience).</li>
+          </ul>
+
+          <h2>2. Impératifs du projet</h2>
+          <p class="small">Le projet couvre les domaines demandés par le jury TFE.</p>
+          <table>
+            <thead>
+              <tr><th>Domaine</th><th>Livrable / exigence</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Systèmes d'exploitation</td><td>Script de sauvegarde automatique (cron / service)</td></tr>
+              <tr><td>Structure matérielle & logicielle</td><td>Base de données SQLite (intégrée à l'application Python)</td></tr>
+              <tr><td>Réseaux informatiques</td><td>Serveur NAS pour centralisation et partage des sauvegardes</td></tr>
+              <tr><td>Informatique embarquée</td><td>Interface Python (application principale côté client / GUI ou CLI)</td></tr>
+            </tbody>
+          </table>
+
+          <h2>Fonctionnalités proposées</h2>
+          <ul>
+            <li>Gestion des utilisateurs (élèves, professeurs, admins).</li>
+            <li>Inventaire des matériels avec état, photos et historique.</li>
+            <li>Emprunt / retour avec date prévue et état au prêt / retour.</li>
+            <li>Notifications automatiques par e-mail (ou alertes internes) pour les retards.</li>
+            <li>Génération d'amendes en cas de non‑respect des délais.</li>
+            <li>Historique et rapports exportables (CSV / PDF).</li>
+            <li>Sauvegardes régulières vers le NAS et versioning des dumps SQLite.</li>
+          </ul>
+
+          <h2>Architecture technique (proposition)</h2>
+          <p>Voici une architecture simple et robuste adaptée aux contraintes :</p>
+          <ol>
+            <li><strong>Frontend / Interface :</strong> Application Python (Tkinter ou Flask + interface web légère) utilisée par les utilisateurs.</li>
+            <li><strong>Base de données :</strong> SQLite stockée sur une machine centrale ou sur le NAS (avec accès contrôlé).</li>
+            <li><strong>Partage & sauvegarde :</strong> Serveur NAS monté via SMB/NFS ; script de sauvegarde qui fait des dumps périodiques et copie vers NAS.</li>
+            <li><strong>Notifications :</strong> Service périodique (cron) qui vérifie les emprunts en retard et envoie des e-mails ou ajoute des pénalités.</li>
+            <li><strong>Sécurité :</strong> sauvegardes chiffrées, permissions d'accès restreintes, logs d'audit.</li>
+          </ol>
+
+          <h3>Exemple de schéma de base (simplifié)</h3>
+          <pre>
+-- tables principales (SQLite)
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY,
+  role TEXT NOT NULL, -- student, teacher, admin
+  name TEXT NOT NULL,
+  email TEXT UNIQUE
+);
+
+CREATE TABLE items (
+  id INTEGER PRIMARY KEY,
+  code TEXT UNIQUE,
+  name TEXT,
+  category TEXT,
+  status TEXT, -- neuf, bon, mauvais
+  notes TEXT
+);
+
+CREATE TABLE loans (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER,
+  item_id INTEGER,
+  date_out TEXT,
+  date_due TEXT,
+  date_returned TEXT,
+  fine_amount REAL DEFAULT 0,
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(item_id) REFERENCES items(id)
+);
+          </pre>
+
+          <div class="code-meta">NB: adapter les types / contraintes selon les besoins et indexer les colonnes fréquemment interrogées.</div>
+
+        </article>
+
+        <article class="card" style="margin-top:18px">
+          <h2>Exemples de scripts & modules</h2>
+          <h3>1) Script de sauvegarde (bash)</h3>
+          <pre>
+#!/bin/bash
+# dump sqlite et copie vers NAS
+DB_PATH="/srv/app/data/database.db"
+DUMP_DIR="/tmp/db_dumps"
+NAS_DIR="/mnt/nas/backups/tfe_loans"
+
+mkdir -p "$DUMP_DIR"
+DUMP_FILE="$DUMP_DIR/db_$(date +%F_%H%M).sqlite"
+
+sqlite3 "$DB_PATH" ".backup '$DUMP_FILE'"
+# verification/rotation
+rsync -av --delete "$DUMP_DIR/" "$NAS_DIR/"
+# (optionnel) chiffrer le dump avec gpg
+          </pre>
+
+          <h3>2) Vérification des retards (Python - cron job)</h3>
+          <pre>
+from datetime import date, datetime
+import sqlite3
+
+conn = sqlite3.connect('/srv/app/data/database.db')
+cur = conn.cursor()
+cur.execute("SELECT loans.id, users.email, items.name, loans.date_due FROM loans JOIN users ON loans.user_id=users.id JOIN items ON loans.item_id=items.id WHERE loans.date_returned IS NULL")
+for loan in cur.fetchall():
+    loan_id, email, item_name, date_due = loan
+    due = datetime.fromisoformat(date_due).date()
+    if due < date.today():
+        # envoyer notification / calculer amende
+        pass
+          </pre>
+
+          <div class="small">Ces scripts sont des points de départ — je peux fournir des versions complètes prêtes à l'emploi.</div>
+        </article>
+
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3>Aperçu rapide</h3>
+          <p class="small">Résumé des composants</p>
+          <ul>
+            <li><strong>Interface :</strong> Python (Tkinter / Flask)</li>
+            <li><strong>DB :</strong> SQLite</li>
+            <li><strong>Sauvegarde :</strong> Script bash + NAS</li>
+            <li><strong>Notifications :</strong> Cron / service Python</li>
+          </ul>
+
+          <h3>Livrables possibles</h3>
+          <ul class="small">
+            <li>Page web de présentation (ce document)</li>
+            <li>Application Python (GUI ou web)</li>
+            <li>Schéma SQLite + dataset de test</li>
+            <li>Script de sauvegarde automatisé</li>
+            <li>Rapport TFE (PDF) et guide d'installation</li>
+          </ul>
+
+          <div style="margin-top:10px" class="row">
+            <a class="btn" href="#next-steps">Étapes suivantes</a>
+            <span class="pill">Prêt à étendre</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <h3>Étapes recommandées</h3>
+          <ol class="small">
+            <li>Valider le périmètre fonctionnel avec le tuteur.</li>
+            <li>Concevoir le schéma complet de la BDD.</li>
+            <li>Développer l'API / l'interface Python minimale (MVP).</li>
+            <li>Mettre en place NAS + script de sauvegarde et tests de restauration.</li>
+            <li>Tests utilisateurs et itérations.</li>
+          </ol>
+        </div>
+      </aside>
+
+    </div>
+
+    <section id="next-steps" class="card" style="margin-top:20px">
+      <h2>Prochaines livraisons possibles</h2>
+      <p class="small">Je peux produire directement, sur demande :</p>
+      <ul>
+        <li>Un squelette d'application Python (Flask + SQLite) prêt à exécuter.</li>
+        <li>Le script de sauvegarde complet avec rotation et chiffrement (gpg).</li>
+        <li>Un export SQL complet pour initialiser la BDD et des jeux de données de test.</li>
+        <li>Un guide d'installation pas-à‑pas pour déployer sur un NAS et configurer les droits.</li>
+      </ul>
+
+      <div style="margin-top:12px" class="small">Si vous le souhaitez, je peux générer un squelette d'application Python et le SQL de création des tables dans la prochaine étape.</div>
+    </section>
+
+    <footer>
+      Créé automatiquement — page de synthèse du TFE « Gestion d'emprunt de matériel ». Dites-moi ce que vous voulez modifier (langue, niveau technique, ajouter diagramme, etc.).
+    </footer>
+  </main>
+</body>
 </html>
